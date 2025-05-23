@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App for Broker Quote Parsing (OpenAI SDK v1.x Compatible)
+# Freight Whisperer: Streamlit App for Broker Quote Parsing (GPT-4 fallback to GPT-3.5)
 
 import streamlit as st
 import openai
@@ -42,13 +42,23 @@ Return as JSON."""
 
     try:
         client = openai.OpenAI(api_key=openai_api_key)
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
+        # Try GPT-4 first
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}]
+            )
+        except Exception as e:
+            st.warning("GPT-4 unavailable or inaccessible. Falling back to GPT-3.5.")
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}]
+            )
+
         result = response.choices[0].message.content
         st.subheader("Extracted Output")
         st.json(json.loads(result))
     except Exception as e:
         st.error(f"Error: {e}")
+
 
