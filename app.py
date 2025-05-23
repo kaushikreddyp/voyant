@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App for Broker Quote Parsing (GPT-4 fallback to GPT-3.5)
+# Freight Whisperer: Streamlit App for Broker Quote Parsing (Improved Prompt + Fallback)
 
 import streamlit as st
 import openai
@@ -26,19 +26,23 @@ if st.button("Decode Quote") and openai_api_key:
     prompt = f"""Extract the following fields from this broker message:
 - Vessel name
 - Vessel type
-- DWT
+- DWT (if missing, infer approximate from vessel type)
 - Open port
-- Laycan
-- Route
+- Laycan (date range if possible, else say 'Not specified')
+- Route (origin to destination)
 - Cargo (if any)
 - Redelivery port
 - Daily rate (USD)
 - Charterer (if any)
-- Sentiment (bullish, neutral, bearish)
+- Market sentiment (bullish, neutral, bearish)
+- Confidence level for each field (High, Medium, Low)
+
+Avoid using generic placeholders like 'Prompt Supra' as vessel name.
+If fields are missing, try to infer or explain why not extracted.
 
 Message: {quote}
 
-Return as JSON."""
+Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, laycan, route, cargo, redelivery_port, rate_usd_day, charterer, sentiment, and confidence_scores (dict)."""
 
     try:
         client = openai.OpenAI(api_key=openai_api_key)
