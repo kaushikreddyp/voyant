@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App for Broker Quote Parsing
+# Freight Whisperer: Streamlit App for Broker Quote Parsing (OpenAI SDK v1.x Compatible)
 
 import streamlit as st
 import openai
@@ -18,7 +18,7 @@ openai_api_key = st.secrets.get("openai_api_key") or st.text_input("Enter your O
 quote = st.text_area(
     "Paste Broker Quote", 
     height=200, 
-    value="MV Blue Whale, Supramax 56k DWT, open CJK 25-27 May, 1st leg trip via NoPac to Singapore-Japan range, redelivery Japan, $16,250/d basis dop. Charterers: Bunge."
+    value="MV Blue Whale, Supramax 56k DWT, open CJK 25-27 May, 1st leg trip via NoPac to Singapore–Japan range, redelivery Japan, $16,250/d basis dop. Charterers: Bunge."
 )
 
 # Button to decode quote
@@ -41,9 +41,9 @@ Message: {quote}
 Return as JSON."""
 
     try:
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=openai_api_key)
+        response = client.chat.completions.create(
             model="gpt-4",
-            api_key=openai_api_key,
             messages=[{"role": "user", "content": prompt}]
         )
         result = response.choices[0].message.content
@@ -51,3 +51,4 @@ Return as JSON."""
         st.json(json.loads(result))
     except Exception as e:
         st.error(f"Error: {e}")
+
