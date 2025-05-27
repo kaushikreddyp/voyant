@@ -1,7 +1,7 @@
-# Freight Whisperer: Streamlit App Using OpenRouter with Hardcoded API Key (for testing)
+# Freight Whisperer: Streamlit App Using OpenRouter with `requests` (No SDK dependency)
 
 import streamlit as st
-import openai
+import requests
 import json
 
 # Set the page config
@@ -11,11 +11,8 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Initialize OpenRouter with hardcoded API key for testing
-client = openai.OpenAI(
-    api_key="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",
-    base_url="https://openrouter.ai/api/v1"
-)
+# Secret or input for OpenRouter API Key
+api_key = st.secrets.get("openrouter_api_key") or st.text_input("Enter your OpenRouter API Key", type="password")
 
 # Text input area for broker quote
 quote = st.text_area(
@@ -25,7 +22,7 @@ quote = st.text_area(
 )
 
 # Button to decode quote
-if st.button("Decode Quote"):
+if st.button("Decode Quote") and api_key:
     prompt = f"""Extract the following fields from this broker message:
 - Vessel name
 - Vessel type
@@ -47,15 +44,28 @@ Message: {quote}
 
 Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, laycan, route, cargo, redelivery_port, rate_usd_day, charterer, sentiment, and confidence_scores (dict)."""
 
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistralai/mixtral-8x7b",
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+
     try:
-        response = client.chat.completions.create(
-            model="mistralai/mixtral-8x7b",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        result = response.choices[0].message.content
-        st.subheader("Extracted Output")
-        st.json(json.loads(result))
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+
+        if response.status_code == 200:
+            result = response.json()["choices"][0]["message"]["content"]
+            st.subheader("Extracted Output")
+            st.json(json.loads(result))
+        else:
+            st.error(f"Error: {response.status_code} - {response.text}")
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Request failed: {e}")
 
 
