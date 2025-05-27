@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App Using OpenRouter with `requests` (No SDK dependency)
+# Freight Whisperer: Streamlit App Using OpenRouter (Hardcoded Key for Local/Private Testing)
 
 import streamlit as st
 import requests
@@ -11,8 +11,11 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Secret or input for OpenRouter API Key
-api_key = st.secrets.get("openrouter_api_key") or st.text_input("Enter your OpenRouter API Key", type="password")
+# Hardcoded OpenRouter API key for private testing only
+api_key = "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"
+
+# Debug check for local validation
+st.write("Loaded API key?", bool(api_key))
 
 # Text input area for broker quote
 quote = st.text_area(
