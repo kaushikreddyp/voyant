@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App Using OpenRouter (Hardcoded Key for Local/Private Testing)
+# Freight Whisperer: Streamlit App Using Groq (No Referer Restrictions)
 
 import streamlit as st
 import requests
@@ -11,11 +11,8 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Hardcoded OpenRouter API key for private testing only
-api_key = "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"
-
-# Debug check for local validation
-st.write("Loaded API key?", bool(api_key))
+# Groq API key input
+api_key = st.secrets.get("groq_api_key") or st.text_input("Enter your Groq API Key", type="password")
 
 # Text input area for broker quote
 quote = st.text_area(
@@ -53,14 +50,14 @@ Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, layca
     }
 
     data = {
-        "model": "mistralai/mixtral-8x7b",
+        "model": "mixtral-8x7b-32768",
         "messages": [
             {"role": "user", "content": prompt}
         ]
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=data)
 
         if response.status_code == 200:
             result = response.json()["choices"][0]["message"]["content"]
