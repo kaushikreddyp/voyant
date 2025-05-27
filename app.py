@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App Using OpenRouter with OpenAI SDK v1.x
+# Freight Whisperer: Streamlit App Using OpenRouter with Hardcoded API Key (for testing)
 
 import streamlit as st
 import openai
@@ -11,9 +11,9 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Initialize OpenRouter with new OpenAI SDK structure
+# Initialize OpenRouter with hardcoded API key for testing
 client = openai.OpenAI(
-    api_key="your-openrouter-key-here",  # Replace with your actual OpenRouter API key
+    api_key="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",
     base_url="https://openrouter.ai/api/v1"
 )
 
