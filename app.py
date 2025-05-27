@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App Using Groq (No Referer Restrictions)
+# Freight Whisperer: Streamlit App Using Groq (Updated to Active Model)
 
 import streamlit as st
 import requests
@@ -50,7 +50,7 @@ Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, layca
     }
 
     data = {
-        "model": "mixtral-8x7b-32768",
+        "model": "mixtral-8x7b",
         "messages": [
             {"role": "user", "content": prompt}
         ]
@@ -67,5 +67,6 @@ Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, layca
             st.error(f"Error: {response.status_code} - {response.text}")
     except Exception as e:
         st.error(f"Request failed: {e}")
+
 
 
