@@ -1,4 +1,4 @@
-# Freight Whisperer: Streamlit App Using OpenRouter (Free AI API Alternative)
+# Freight Whisperer: Streamlit App Using OpenRouter with OpenAI SDK v1.x
 
 import streamlit as st
 import openai
@@ -11,9 +11,11 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Use OpenRouter API instead of OpenAI for free alternative
-openai.api_key = "your-openrouter-key-here"  # Replace this with your OpenRouter API key
-openai.api_base = "https://openrouter.ai/api/v1"
+# Initialize OpenRouter with new OpenAI SDK structure
+client = openai.OpenAI(
+    api_key="your-openrouter-key-here",  # Replace with your actual OpenRouter API key
+    base_url="https://openrouter.ai/api/v1"
+)
 
 # Text input area for broker quote
 quote = st.text_area(
@@ -46,8 +48,8 @@ Message: {quote}
 Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, laycan, route, cargo, redelivery_port, rate_usd_day, charterer, sentiment, and confidence_scores (dict)."""
 
     try:
-        response = openai.ChatCompletion.create(
-            model="openrouter/mixtral-8x7b",  # Use Mixtral or another free model from OpenRouter
+        response = client.chat.completions.create(
+            model="mistralai/mixtral-8x7b",
             messages=[{"role": "user", "content": prompt}]
         )
         result = response.choices[0].message.content
