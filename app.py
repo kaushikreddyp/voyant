@@ -11,8 +11,9 @@ st.set_page_config(page_title="Freight Whisperer")
 st.title("🚢 Freight Whisperer")
 st.subheader("Paste a broker message, get structured trade info + price signal")
 
-# Input for OpenAI API Key
-openai_api_key = st.secrets.get("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") or st.text_input("Enter your OpenAI API Key", type="password")
+# ✅ Hardcoded OpenAI API Key
+api_key = "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"
+client = openai.OpenAI(api_key=api_key)
 
 # Text input area for broker quote
 quote = st.text_area(
@@ -22,7 +23,7 @@ quote = st.text_area(
 )
 
 # Button to decode quote
-if st.button("Decode Quote") and openai_api_key:
+if st.button("Decode Quote"):
     prompt = f"""Extract the following fields from this broker message:
 - Vessel name
 - Vessel type
@@ -45,14 +46,13 @@ Message: {quote}
 Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, laycan, route, cargo, redelivery_port, rate_usd_day, charterer, sentiment, and confidence_scores (dict)."""
 
     try:
-        client = openai.OpenAI(api_key=openai_api_key)
         # Try GPT-4 first
         try:
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}]
             )
-        except Exception as e:
+        except Exception:
             st.warning("GPT-4 unavailable or inaccessible. Falling back to GPT-3.5.")
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -64,5 +64,6 @@ Return result as JSON with keys: vessel_name, vessel_type, dwt, open_port, layca
         st.json(json.loads(result))
     except Exception as e:
         st.error(f"Error: {e}")
+
 
 
